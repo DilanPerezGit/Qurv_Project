@@ -942,3 +942,21 @@ class SuperK_2014(Instrument):
                 power_density = self.get_power_calibration_inv(self.get_power(), value);
                 self.set_power_density(power_density);
             self._testvar = 0;
+    def Dilan_set_output(self, value):
+            """
+            Check set_output DocString for more information.
+            When setting output, the 'state' must be OFF. This function makes sure of it and also checks if the output and wavelength have 
+            been been properly set.
+            """
+            SuperK.set_state('OFF')
+            SuperK.set_output(f'{value}')
+            if value == 'VIS/NIR':
+                wl = 655
+                SuperK.set_wavelength(wl)
+            elif value == 'NIR/IR':
+                wl = 1211
+                SuperK.set_wavelength(wl)
+            SuperK.set_state('ON')
+            
+            if SuperK.get_state == 'ON' and SuperK.get_wavelength() == wl:
+                print("Configuration properly set : )")
