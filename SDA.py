@@ -72,7 +72,8 @@ class EasyExpert():
 
         x_data, y_data = np.array(xlist), np.array(ylist)
         return np.array([x_data, y_data])
-
+    def close(self):
+        self.visa.close()
     # Resistors Analisis Functions
     def Linear_Regression(self,xData, yData):
         """
@@ -152,15 +153,15 @@ class EasyExpert():
 
 
 
-SDA = EasyExpert()
-SDA.idn() 
-SDA.select_measurement("Dilan IV Sweep")
-SDA.set_parameters(Vmin = -0.5, Vmax = 1, Vstep = 0.01)
-SDA.run()
+# SDA = EasyExpert()
+# SDA.idn() 
+# SDA.select_measurement("Dilan IV Sweep")
+# SDA.set_parameters(Vmin = -0.5, Vmax = 1, Vstep = 0.01)
+# SDA.run()
 
 
-x,y = SDA.GetData()
-plt.plot(x,y*10**6)
-plt.xlabel("Voltage (V)")
-plt.ylabel("Current (μA)")
-plt.show()
+# x,y = SDA.GetData()
+# plt.plot(x,y*10**6)
+# plt.xlabel("Voltage (V)")
+# plt.ylabel("Current (μA)")
+# plt.show()

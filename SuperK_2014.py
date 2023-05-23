@@ -948,15 +948,16 @@ class SuperK_2014(Instrument):
             When setting output, the 'state' must be OFF. This function makes sure of it and also checks if the output and wavelength have 
             been been properly set.
             """
-            SuperK.set_state('OFF')
-            SuperK.set_output(f'{value}')
+            self.set_state('OFF')
+            self.set_output(f'{value}')
             if value == 'VIS/NIR':
                 wl = 655
-                SuperK.set_wavelength(wl)
+                self.set_wavelength(wl)
             elif value == 'NIR/IR':
                 wl = 1211
-                SuperK.set_wavelength(wl)
-            SuperK.set_state('ON')
+                self.set_wavelength(wl)
+            self.set_state('ON')
             
-            if SuperK.get_state == 'ON' and SuperK.get_wavelength() == wl:
-                print("Configuration properly set : )")
+            if self.get_state == 'ON' and self.get_wavelength() == wl:
+                print("Configuration properly set")
+                print(f"output = {value}")
