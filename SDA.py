@@ -1,3 +1,7 @@
+import os
+# os.getcwd()
+# os.chdir("Instruments")
+# os.getcwd()
 import pyvisa
 import numpy as np
 import matplotlib.pyplot as plt
@@ -12,10 +16,11 @@ class EasyExpert():
         self.visa = rm.open_resource('TCPIP0::192.168.0.3::5025::SOCKET', write_termination='\n')
         self.visa.read_termination = "\n"
         time.sleep(3)
-    
-    def idn(self):
-        print(self.visa.query("*IDN?"))  
-    def select_measurement(self,value):
+
+    def SDA_idn(self):
+        print(self.visa.query("*IDN?"))
+
+    def SDA_select_measurement(self, value):
         try:
             if value != 'Dilan IV Sweep':
                 print("Not available measurement. Only available: Dilan IV Sweep")
@@ -27,43 +32,47 @@ class EasyExpert():
             # self.visa.close()
             # self.visa = rm.open_resource('TCPIP0::192.168.0.3::5025::SOCKET', write_termination='\n')
             # self.visa.read_termination = "\n"
-    def set_parameters(self, Vmin = -0.5, Vmax = 1, Vstep = 1):
+
+    def SDA_set_parameters(self, Vmin=-0.5, Vmax=1, Vstep=1):
         try:
             self.visa.write(f"NUMBer 'Vmin'  , {Vmin} ")
             self.visa.write(f"NUMBer 'Vmax'  , {Vmax} ")
             self.visa.write(f"NUMBer 'Vstep' , {Vstep} ")
 
-            a = float(self.visa.query("NUMBer? 'Vmin' " ))
-            b = float(self.visa.query("NUMBer? 'Vmax' " ))
-            c = float(self.visa.query("NUMBer? 'Vstep'" ))
+            a = float(self.visa.query("NUMBer? 'Vmin' "))
+            b = float(self.visa.query("NUMBer? 'Vmax' "))
+            c = float(self.visa.query("NUMBer? 'Vstep'"))
 
-            print("Vmin  =", round(a,4) )
-            print("Vmax  =", round(b,4) )
-            print("Vstep =", round(c,4) )
+            print("Vmin  =", round(a, 4))
+            print("Vmax  =", round(b, 4))
+            print("Vstep =", round(c, 4))
         except pyvisa.errors.VisaIOError as e:
             print(str({e}))
             # self.visa.close()
             # self.visa = rm.open_resource('TCPIP0::192.168.0.3::5025::SOCKET', write_termination='\n')
             # self.visa.read_termination = "\n"
-    def run(self):
-        self.visa.write("RUN")   
-    def GetData(self): 
+
+    def SDA_run(self):
+        self.visa.write("RUN")
+
+    def SDA_GetData(self):
         # Getting the data
         self.visa.write(":RESult:FORMat TXT")
         self.visa.query(":RESult:FETch:LATest?")
         xlist = []
         ylist = []
-        while True:                                                                        # The whole file is printed line by line, therefore I have to SDA.read() as many times as data points
-            try:                                                                           # If exception occurs is because the SDA has nothing else to give me. However, the following code gets an error before since the last line that SDA.read() gives doesn't contain an \r character, therefore the r_index definition prompts an error.
+        while True:  # The whole file is printed line by line, therefore I have to SDA.read() as many times as data points
+            try:  # If exception occurs is because the SDA has nothing else to give me. However, the following code gets an error before since the last line that SDA.read() gives doesn't contain an \r character, therefore the r_index definition prompts an error.
                 txt_data = self.visa.read()
                 if not ("\r" in txt_data):
                     t_index = txt_data.index("\t")
                     x, y = txt_data[:t_index], txt_data[t_index + 1:]
                     break
                 else:
-                    t_index, r_index = txt_data.index("\t"), txt_data.index("\r")          # \t and \r list index
-                    x, y = txt_data[:t_index], txt_data[t_index + 1:r_index]               # t_index +1 because the whole \t counts as a 1 character
-                xlist.append(float(x))                                                     # converting strings into floats
+                    t_index, r_index = txt_data.index("\t"), txt_data.index("\r")  # \t and \r list index
+                    x, y = txt_data[:t_index], txt_data[
+                                               t_index + 1:r_index]  # t_index +1 because the whole \t counts as a 1 character
+                xlist.append(float(x))  # converting strings into floats
                 ylist.append(float(y))
             except:
                 print(f"Line could not be processed \n: Line was: {txt_data}")
@@ -72,14 +81,20 @@ class EasyExpert():
 
         x_data, y_data = np.array(xlist), np.array(ylist)
         return np.array([x_data, y_data])
-    def close(self):
+
+
+    def SDA_OPC(self):
+        ans = self.visa.query("*OPC?")
+        return float(ans)
+    def SDA_close(self):
         self.visa.close()
+
     # Resistors Analisis Functions
-    def Linear_Regression(self,xData, yData):
+    def SDA_Linear_Regression(self, xData, yData):
         """
         Linear Fitting. It returns the x,y fitted data, the slope 
         and the intercept.
-        """  
+        """
         x_sm = sm.add_constant(xData)
         model = sm.OLS(yData, x_sm)
         fit = model.fit()
@@ -88,7 +103,8 @@ class EasyExpert():
         x_fit = np.linspace(xData[0], xData[-1], 30)
         y_fit = n + x_fit * m
         return [x_fit, y_fit, m, n]
-    def ResistorAnalisis(self,name):  
+
+    def SDA_ResistorAnalisis(self, name):
         """
         name = number of the measurement. It must be a number. This function 
         retrieves the data of the IV curve measurement done over a device 
@@ -111,7 +127,8 @@ class EasyExpert():
         plt.ylabel('I (μA)')
         plt.legend()
         return [x_data, y_data, x_fit, y_fit, m, n]
-    def ResistorS(self):  
+
+    def SDA_ResistorS(self):
         """
         This function takes the data from all the files stored using the 
         ResistorsAnalisis function and plot them all in a single plot.
@@ -150,16 +167,14 @@ class EasyExpert():
             plt.legend(fontsize=5)
         plt.title("Julien's Resistors")
         return [xdataS, ydataS, xfitS, yfitS, mS, nS]
-
-
-
-# SDA = EasyExpert()
-# SDA.idn() 
+#
+SDA = EasyExpert()
+# SDA.idn()
 # SDA.select_measurement("Dilan IV Sweep")
-# SDA.set_parameters(Vmin = -0.5, Vmax = 1, Vstep = 0.01)
+# SDA.set_parameters(Vmin = -0.5, Vmax = 1, Vstep = 0.1)
 # SDA.run()
-
-
+# SDA.close()
+#
 # x,y = SDA.GetData()
 # plt.plot(x,y*10**6)
 # plt.xlabel("Voltage (V)")

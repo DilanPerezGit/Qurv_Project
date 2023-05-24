@@ -14,11 +14,12 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 # from lib.dll_support import superk_aotf
+import os
 from re import L
-from instrument import Instrument
+from Instruments.instrument import Instrument
 import pyvisa
 # import visa
-import lib.visa as visa
+import Instruments.lib.visa as visa
 from pyvisa.constants import StopBits, Parity
 import logging
 from scipy import *
@@ -27,7 +28,6 @@ from binascii import unhexlify
 # import crc16 as crc16;
 from crccheck.crc import CrcXmodem
 import time
-import os
 import matplotlib.pyplot as plt
 # import statsmodels.api as sm
 import pickle as pk
@@ -942,22 +942,46 @@ class SuperK_2014(Instrument):
                 power_density = self.get_power_calibration_inv(self.get_power(), value);
                 self.set_power_density(power_density);
             self._testvar = 0;
-    def Dilan_set_output(self, value):
-            """
-            Check set_output DocString for more information.
-            When setting output, the 'state' must be OFF. This function makes sure of it and also checks if the output and wavelength have 
-            been been properly set.
-            """
-            self.set_state('OFF')
-            self.set_output(f'{value}')
-            if value == 'VIS/NIR':
-                wl = 655
-                self.set_wavelength(wl)
-            elif value == 'NIR/IR':
-                wl = 1211
-                self.set_wavelength(wl)
-            self.set_state('ON')
-            
-            if self.get_state == 'ON' and self.get_wavelength() == wl:
-                print("Configuration properly set")
-                print(f"output = {value}")
+    
+    def SuperK_set_output(self, value):
+        """
+        Check set_output DocString for more information.
+        When setting output, the 'state' must be OFF. This function makes sure of it and also checks if the output and wavelength have 
+        been been properly set.
+        """
+        self.set_state('OFF')
+        self.set_output(f'{value}')
+        if value == 'VIS/NIR':
+            wl = 655
+            self.set_wavelength(wl)
+            print(f"output = {value}")
+            print(f"lambda = {wl}")
+        elif value == 'NIR/IR':
+            wl = 1211
+            self.set_wavelength(wl)
+            print(f"output = {value}")
+            print(f"lambda = {wl}")
+        self.set_state('ON')
+
+
+
+    def SuperK_set_state(self,value):
+        self.set_state(value)
+        print("state =", self.get_state())
+
+    def SuperK_set_wavelength(self,value):
+        self.set_wavelength(value)
+        print("lambda =", self.get_wavelength())
+    def SuperK_set_power(self,value):
+        self.set_power(value)
+        print("power =", self.get_power())
+
+    def SuperK_get_state(self):
+        return self.get_state(self)
+    def SuperK_get_output(self):
+        return self.get_output(self)
+    def SuperK_get_wavelength(self):
+        return self.get_wavelength(self)
+    def SuperK_get_power(self):
+        return self.get_power(self)
+
