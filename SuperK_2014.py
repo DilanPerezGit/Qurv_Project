@@ -16,10 +16,10 @@
 # from lib.dll_support import superk_aotf
 import os
 from re import L
-from Instruments.instrument import Instrument
+from instrument import Instrument
 import pyvisa
 # import visa
-import Instruments.lib.visa as visa
+import lib.visa as visa
 from pyvisa.constants import StopBits, Parity
 import logging
 from scipy import *

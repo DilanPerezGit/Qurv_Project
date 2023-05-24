@@ -1,7 +1,4 @@
 import os
-# os.getcwd()
-# os.chdir("Instruments")
-# os.getcwd()
 import pyvisa
 import numpy as np
 import matplotlib.pyplot as plt
@@ -17,10 +14,10 @@ class EasyExpert():
         self.visa.read_termination = "\n"
         time.sleep(3)
 
-    def SDA_idn(self):
+    def idn(self):
         print(self.visa.query("*IDN?"))
 
-    def SDA_select_measurement(self, value):
+    def select_measurement(self, value):
         try:
             if value != 'Dilan IV Sweep':
                 print("Not available measurement. Only available: Dilan IV Sweep")
@@ -33,7 +30,7 @@ class EasyExpert():
             # self.visa = rm.open_resource('TCPIP0::192.168.0.3::5025::SOCKET', write_termination='\n')
             # self.visa.read_termination = "\n"
 
-    def SDA_set_parameters(self, Vmin=-0.5, Vmax=1, Vstep=1):
+    def set_parameters(self, Vmin=-0.5, Vmax=1, Vstep=1):
         try:
             self.visa.write(f"NUMBer 'Vmin'  , {Vmin} ")
             self.visa.write(f"NUMBer 'Vmax'  , {Vmax} ")
@@ -52,10 +49,10 @@ class EasyExpert():
             # self.visa = rm.open_resource('TCPIP0::192.168.0.3::5025::SOCKET', write_termination='\n')
             # self.visa.read_termination = "\n"
 
-    def SDA_run(self):
+    def run(self):
         self.visa.write("RUN")
 
-    def SDA_GetData(self):
+    def GetData(self):
         # Getting the data
         self.visa.write(":RESult:FORMat TXT")
         self.visa.query(":RESult:FETch:LATest?")
@@ -83,14 +80,14 @@ class EasyExpert():
         return np.array([x_data, y_data])
 
 
-    def SDA_OPC(self):
+    def OPC(self):
         ans = self.visa.query("*OPC?")
         return float(ans)
-    def SDA_close(self):
+    def close(self):
         self.visa.close()
 
     # Resistors Analisis Functions
-    def SDA_Linear_Regression(self, xData, yData):
+    def Linear_Regression(self, xData, yData):
         """
         Linear Fitting. It returns the x,y fitted data, the slope 
         and the intercept.
@@ -104,7 +101,7 @@ class EasyExpert():
         y_fit = n + x_fit * m
         return [x_fit, y_fit, m, n]
 
-    def SDA_ResistorAnalisis(self, name):
+    def ResistorAnalisis(self, name):
         """
         name = number of the measurement. It must be a number. This function 
         retrieves the data of the IV curve measurement done over a device 
@@ -128,7 +125,7 @@ class EasyExpert():
         plt.legend()
         return [x_data, y_data, x_fit, y_fit, m, n]
 
-    def SDA_ResistorS(self):
+    def ResistorS(self):
         """
         This function takes the data from all the files stored using the 
         ResistorsAnalisis function and plot them all in a single plot.
@@ -167,8 +164,9 @@ class EasyExpert():
             plt.legend(fontsize=5)
         plt.title("Julien's Resistors")
         return [xdataS, ydataS, xfitS, yfitS, mS, nS]
-#
+
 SDA = EasyExpert()
+
 # SDA.idn()
 # SDA.select_measurement("Dilan IV Sweep")
 # SDA.set_parameters(Vmin = -0.5, Vmax = 1, Vstep = 0.1)
