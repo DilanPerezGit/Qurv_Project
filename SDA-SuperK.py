@@ -1,8 +1,8 @@
 import os
 from re import L
-from instrument import Instrument
+from Instruments.instrument import Instrument
 import pyvisa
-import lib.visa as visa
+import Instruments.lib.visa as visa
 from pyvisa.constants import StopBits, Parity
 import logging
 from scipy import *
@@ -21,9 +21,9 @@ from SuperK_2014 import SuperK_2014
 
 class SuperSDA():
     def __init__(self):
-        self.SDA    = EasyExpert.__init__(self)
-        self.SuperK = SuperK_2014.__init__(self, "SuperK", "COM4")
-        self.visa.timeout = 300
+        self.SDA    = EasyExpert()
+        self.SuperK = SuperK_2014("SuperK", "COM4")
+        self.SDA.visa.timeout = 300
 
     def LambdaDependent_Measurement(self, lo = 1200, lf = 1500, step = 100):
         LambdaRange = np.arange(lo, lf, step)
@@ -44,7 +44,7 @@ class SuperSDA():
 
             while True:
                 try:
-                    self.visa.read()
+                    self.SDA.visa.read()
                 except:
                     break
 
@@ -63,13 +63,19 @@ SuperSDA_ = SuperSDA()
 SuperSDA_.SDA.idn()
 SuperSDA_.SDA.select_measurement("Dilan IV Sweep")
 SuperSDA_.SDA.set_parameters(-0.5,0.5,0.1)
-SuperSDA_.SuperK.SuperK_set_output("NIR/IR")
-SuperSDA_.SuperK.SuperK_set_wavelength(1500)
-SuperSDA_.SuperK.SuperK_set_power(100)
 
-----------------------------------------------------------------
+SuperSDA_.SuperK.set_output("NIR/IR")
+SuperSDA_.SuperK.set_state("ON")
+SuperSDA_.SuperK.set_wavelength(1500)
+SuperSDA_.SuperK.set_power(100)
+
+
+
+# ----------------------------------------------------------------
 Data, LambdaRange = SuperSDA_.LambdaDependent_Measurement()
 
+
+# Plot all the data in Data
 for values in LambdaRange:
     x, y = Data[f"{values}"]
     plt.plot(x, y * 10 ** 6)

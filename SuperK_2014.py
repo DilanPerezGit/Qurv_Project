@@ -16,10 +16,10 @@
 # from lib.dll_support import superk_aotf
 import os
 from re import L
-from instrument import Instrument
+from Instruments.instrument import Instrument
 import pyvisa
 # import visa
-import lib.visa as visa
+import Instruments.lib.visa as visa
 from pyvisa.constants import StopBits, Parity
 import logging
 from scipy import *
@@ -943,7 +943,7 @@ class SuperK_2014(Instrument):
                 self.set_power_density(power_density);
             self._testvar = 0;
     
-    def SuperK_set_output(self, value):
+    def _set_output(self, value):
         """
         Check set_output DocString for more information.
         When setting output, the 'state' must be OFF. This function makes sure of it and also checks if the output and wavelength have 
@@ -963,25 +963,4 @@ class SuperK_2014(Instrument):
             print(f"lambda = {wl}")
         self.set_state('ON')
 
-
-
-    def SuperK_set_state(self,value):
-        self.set_state(value)
-        print("state =", self.get_state())
-
-    def SuperK_set_wavelength(self,value):
-        self.set_wavelength(value)
-        print("lambda =", self.get_wavelength())
-    def SuperK_set_power(self,value):
-        self.set_power(value)
-        print("power =", self.get_power())
-
-    def SuperK_get_state(self):
-        return self.get_state(self)
-    def SuperK_get_output(self):
-        return self.get_output(self)
-    def SuperK_get_wavelength(self):
-        return self.get_wavelength(self)
-    def SuperK_get_power(self):
-        return self.get_power(self)
 
